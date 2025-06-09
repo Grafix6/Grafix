@@ -1335,7 +1335,15 @@ Thank you for visiting Grafix69. We are always here to bring you the best experi
         });
 
         // Portfolio Filtering
-        const filterBtn
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterBtns.forEach(b => b.classList.remove('active'));
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
                 
                 // Filtering logic would go here
                 // This is just a demo without actual filtering
