@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafix69 | Movie Collection</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Light theme variables */
+            --bg-primary: #f8f9fa;
+            --bg-secondary: #ffffff;
+            --text-primary: #1a1a1a;
+            --text-secondary: #4a4a4a;
+            --accent-primary: #6c63ff;
+            --accent-secondary: #ff6584;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+            --header-bg: rgba(255, 255, 255, 0.85);
+            --tool-card-bg: #ffffff;
+        }
+
+        .dark-theme {
+            /* Dark theme variables */
+            --bg-primary: #121212;
+            --bg-secondary: #1e1e1e;
+            --text-primary: #f0f0f0;
+            --text-secondary: #b0b0b0;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            --header-bg: rgba(30, 30, 30, 0.85);
+            --tool-card-bg: #2d2d2d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: var(--transition);
+            overflow-x: hidden;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23f8f9fa" opacity="0.05"/><circle cx="20" cy="20" r="3" fill="%236c63ff" opacity="0.1"/><circle cx="80" cy="30" r="2" fill="%236c63ff" opacity="0.1"/><circle cx="50" cy="70" r="4" fill="%236c63ff" opacity="0.1"/></svg>');
+        }
+
+        .dark-theme body {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23121212" opacity="0.05"/><circle cx="20" cy="20" r="3" fill="%236c63ff" opacity="0.1"/><circle cx="80" cy="30" r="2" fill="%236c63ff" opacity="0.1"/><circle cx="50" cy="70" r="4" fill="%236c63ff" opacity="0.1"/></svg>');
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-weight: 700;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 0;
+            z-index: 1000;
+            transition: var(--transition);
+            backdrop-filter: blur(10px);
+            background-color: var(--header-bg);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo span {
+            color: var(--accent-secondary);
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .theme-toggle:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        .back-btn {
+            background: none;
+            border: 2px solid var(--accent-primary);
+            color: var(--accent-primary);
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-btn:hover {
+            background: var(--accent-primary);
+            color: white;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 60vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+            background: linear-gradient(135deg, rgba(108, 99, 255, 0.8), rgba(255, 101, 132, 0.8)), url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Filters Section */
+        .filters {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            margin: -40px auto 50px;
+            max-width: 1000px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        /* Movies Section */
+        .section {
+            padding: 40px 0 80px;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-header h2:after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent-primary);
+            border-radius: 2px;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+        }
+
+        .movie-card {
+            background: var(--tool-card-bg);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            border: 1px solid rgba(108, 99, 255, 0.1);
+        }
+
+        .movie-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .movie-poster {
+            height: 380px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .movie-poster img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .movie-card:hover .movie-poster img {
+            transform: scale(1.05);
+        }
+
+        .movie-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: var(--accent-secondary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 2;
+        }
+
+        .movie-content {
+            padding: 25px;
+        }
+
+        .movie-title {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            transition: var(--transition);
+            min-height: 68px;
+        }
+
+        .movie-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .movie-rating {
+            color: #FFD700;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .movie-description {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .movie-tags {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .movie-tag {
+            background: rgba(108, 99, 255, 0.1);
+            color: var(--accent-primary);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .movie-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .movie-btn {
+            background: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .movie-btn:hover {
+            background: var(--accent-secondary);
+            transform: translateY(-3px);
+        }
+
+        .wishlist-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            background: rgba(108, 99, 255, 0.1);
+            border: none;
+            color: var(--accent-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .wishlist-btn:hover {
+            background: var(--accent-secondary);
+            color: white;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 60px 0 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-col h4 {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-col h4:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--accent-primary);
+        }
+
+        .footer-col p {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 12px;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-primary);
+            transform: translateX(5px);
+        }
+
+        .footer-links a i {
+            margin-right: 8px;
+            font-size: 14px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(108, 99, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            background: var(--accent-primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .section-header h2 {
+                font-size: 2.2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero {
+                height: 50vh;
+            }
+            
+            .hero h1 {
+                font-size: 2.3rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .movies-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+
+            .filter-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .movie-poster {
+                height: 320px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container header-content">
+            <a href="#" class="logo">Grafix<span>69</span></a>
+            <div class="nav-buttons">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <a href="#" class="back-btn">
+                    <i class=></i>sign in
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Movie Collection</h1>
+            <p>Discover the most exciting films from around the world, handpicked for your viewing pleasure</p>
+        </div>
+    </section>
+
+    <!-- Filters Section -->
+    <div class="container">
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-group">
+                    <label for="genre">Genre</label>
+                    <select id="genre" class="filter-select">
+                        <option>All Genres</option>
+                        <option>Action</option>
+                        <option>Adventure</option>
+                        <option>Comedy</option>
+                        <option>Drama</option>
+                        <option>Fantasy</option>
+                        <option>Sci-Fi</option>
+                        <option>Horror</option>
+                        <option>Romance</option>
+                        <option>Thriller</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="year">Release Year</label>
+                    <select id="year" class="filter-select">
+                        <option>All Years</option>
+                        <option>2023</option>
+                        <option>2022</option>
+                        <option>2021</option>
+                        <option>2020</option>
+                        <option>2019</option>
+                        <option>2018</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="rating">Rating</label>
+                    <select id="rating" class="filter-select">
+                        <option>All Ratings</option>
+                        <option>9+ (Excellent)</option>
+                        <option>8+ (Great)</option>
+                        <option>7+ (Good)</option>
+                        <option>6+ (Average)</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="sort">Sort By</label>
+                    <select id="sort" class="filter-select">
+                        <option>Newest First</option>
+                        <option>Highest Rated</option>
+                        <option>Most Popular</option>
+                        <option>A-Z</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movies Section -->
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2>Featured Movies</h2>
+                <p>Handpicked selection of the most exciting films from around the world</p>
+            </div>
+            <div class="movies-grid">
+                <!-- Movie 1 -->
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80" alt="Movie Poster">
+                        <div class="movie-badge">New</div>
+                    </div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">Cosmic Odyssey</h3>
+                        <div class="movie-meta">
+                            <span>2023</span>
+                            <span>2h 18m</span>
+                        </div>
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <span>4.7</span>
+                        </div>
+                        <p class="movie-description">An interstellar adventure through distant galaxies, where a team of explorers discovers the secrets of the universe.</p>
+                        <div class="movie-tags">
+                            <span class="movie-tag">Sci-Fi</span>
+                            <span class="movie-tag">Adventure</span>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="movie-btn">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button class="wishlist-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Movie 2 -->
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://images.unsplash.com/photo-1542204165-65bf26472b9b?auto=format&fit=crop&w=600&q=80" alt="Movie Poster">
+                    </div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">Midnight in Paris</h3>
+                        <div class="movie-meta">
+                            <span>2022</span>
+                            <span>1h 52m</span>
+                        </div>
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>4.1</span>
+                        </div>
+                        <p class="movie-description">A romantic comedy about a writer who finds himself mysteriously going back to the 1920s every night at midnight.</p>
+                        <div class="movie-tags">
+                            <span class="movie-tag">Romance</span>
+                            <span class="movie-tag">Comedy</span>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="movie-btn">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button class="wishlist-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Movie 3 -->
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://images.unsplash.com/photo-1595769816263-9b910be24d5f?auto=format&fit=crop&w=600&q=80" alt="Movie Poster">
+                        <div class="movie-badge">Popular</div>
+                    </div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">The Last Frontier</h3>
+                        <div class="movie-meta">
+                            <span>2023</span>
+                            <span>2h 25m</span>
+                        </div>
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>4.9</span>
+                        </div>
+                        <p class="movie-description">In a post-apocalyptic world, a group of survivors must journey across dangerous territories to find the last safe haven.</p>
+                        <div class="movie-tags">
+                            <span class="movie-tag">Action</span>
+                            <span class="movie-tag">Drama</span>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="movie-btn">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button class="wishlist-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Movie 4 -->
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?auto=format&fit=crop&w=600&q=80" alt="Movie Poster">
+                    </div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">Shadow Games</h3>
+                        <div class="movie-meta">
+                            <span>2022</span>
+                            <span>1h 58m</span>
+                        </div>
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star-half-alt"></i>
+                            <i class="far fa-star"></i>
+                            <span>3.8</span>
+                        </div>
+                        <p class="movie-description">A psychological thriller about a detective who must solve a series of murders connected to a mysterious board game.</p>
+                        <div class="movie-tags">
+                            <span class="movie-tag">Thriller</span>
+                            <span class="movie-tag">Mystery</span>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="movie-btn">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button class="wishlist-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Movie 5 -->
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://images.unsplash.com/photo-1552422535-c45813c61732?auto=format&fit=crop&w=600&q=80" alt="Movie Poster">
+                    </div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">Whispers of Autumn</h3>
+                        <div class="movie-meta">
+                            <span>2023</span>
+                            <span>2h 05m</span>
+                        </div>
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="far fa-star"></i>
+                            <span>4.2</span>
+                        </div>
+                        <p class="movie-description">A heartwarming drama about family, love, and the changing seasons in a small New England town.</p>
+                        <div class="movie-tags">
+                            <span class="movie-tag">Drama</span>
+                            <span class="movie-tag">Family</span>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="movie-btn">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button class="wishlist-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Movie 6 -->
+                <div class="movie-card">
+                    <div class="movie-poster">
+                        <img src="https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80" alt="Movie Poster">
+                        <div class="movie-badge">Classic</div>
+                    </div>
+                    <div class="movie-content">
+                        <h3 class="movie-title">Cinema Paradiso</h3>
+                        <div class="movie-meta">
+                            <span>1988</span>
+                            <span>2h 35m</span>
+                        </div>
+                        <div class="movie-rating">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <span>4.9</span>
+                        </div>
+                        <p class="movie-description">A filmmaker recalls his childhood when falling in love with the pictures at the cinema of his home village.</p>
+                        <div class="movie-tags">
+                            <span class="movie-tag">Drama</span>
+                            <span class="movie-tag">Romance</span>
+                        </div>
+                        <div class="movie-actions">
+                            <button class="movie-btn">
+                                <i class="fas fa-play"></i> Watch Trailer
+                            </button>
+                            <button class="wishlist-btn">
+                                <i class="far fa-bookmark"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h4>Grafix69</h4>
+                    <p>Transforming ideas into exceptional digital experiences through innovative design and strategic thinking.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-dribbble"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Movie Categories</h4>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Action & Adventure</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Drama</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Comedy</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Sci-Fi & Fantasy</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Classics</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul class="footer-links">
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Home</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Portfolio</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Blog</a></li>
+                        <li><a href="#"><i class="fas fa-chevron-right"></i> Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-col">
+                    <h4>Contact Info</h4>
+                    <ul class="footer-links">
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Design Street, Creative City</li>
+                        <li><i class="fas fa-phone-alt"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> info@grafix69.com</li>
+                        <li><i class="fas fa-clock"></i> Mon-Fri: 9AM - 6PM</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2023 Grafix69. All Rights Reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = themeToggle.querySelector('i');
+        
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-theme');
+            
+            if (document.body.classList.contains('dark-theme')) {
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-theme');
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        }
+
+        // Movie card animation
+        document.addEventListener('DOMContentLoaded', function() {
+            const movieCards = document.querySelectorAll('.movie-card');
+            
+            movieCards.forEach((card, index) => {
+                card.style.animation = `fadeIn 0.5s ease forwards ${index * 0.1 + 0.3}s`;
+                card.style.opacity = '0';
+            });
+            
+            // Wishlist button functionality
+            const wishlistBtns = document.querySelectorAll('.wishlist-btn');
+            wishlistBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    if (icon.classList.contains('far')) {
+                        icon.classList.remove('far');
+                        icon.classList.add('fas');
+                        this.style.backgroundColor = 'var(--accent-secondary)';
+                        this.style.color = 'white';
+                    } else {
+                        icon.classList.remove('fas');
+                        icon.classList.add('far');
+                        this.style.backgroundColor = 'rgba(108, 99, 255, 0.1)';
+                        this.style.color = 'var(--accent-primary)';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
