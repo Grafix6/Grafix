@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tony AI Assistant</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: #0a0a12;
+            color: #00ff41;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .scanlines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.1),
+                rgba(0, 0, 0, 0.1) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #00ff41;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo h1 {
+            font-size: 28px;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px rgba(0, 255, 65, 0.5);
+        }
+        
+        .logo .ai-icon {
+            background: #00ff41;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.7);
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            background: #00ff41;
+            border-radius: 50%;
+            margin-right: 8px;
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.7);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            50% { opacity: 1; }
+            100% { opacity: 0.4; }
+        }
+        
+        .terminal {
+            background: rgba(5, 5, 15, 0.9);
+            border: 1px solid #00ff41;
+            border-radius: 8px;
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .terminal-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #003b15;
+        }
+        
+        .terminal-title {
+            font-size: 18px;
+            letter-spacing: 1px;
+        }
+        
+        .terminal-controls {
+            display: flex;
+        }
+        
+        .control-btn {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+        
+        .close { background: #ff5f57; }
+        .minimize { background: #ffbd2e; }
+        .maximize { background: #28c940; }
+        
+        .output {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .output-line {
+            margin-bottom: 8px;
+            animation: appear 0.3s ease-out;
+        }
+        
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-area {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            border-top: 1px solid #003b15;
+            padding-top: 15px;
+        }
+        
+        .prompt {
+            margin-right: 10px;
+            font-weight: bold;
+        }
+        
+        .command-input {
+            background: transparent;
+            border: none;
+            color: #00ff41;
+            font-size: 16px;
+            flex-grow: 1;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            caret-color: #00ff41;
+        }
+        
+        .command-input::placeholder {
+            color: #00802b;
+        }
+        
+        .visualizer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120px;
+            margin-top: 20px;
+        }
+        
+        .visualizer-bars {
+            display: flex;
+            align-items: flex-end;
+            height: 100px;
+            gap: 8px;
+        }
+        
+        .bar {
+            width: 10px;
+            background: #00ff41;
+            border-radius: 5px;
+            animation: bar-anim 1.2s infinite ease-in-out;
+        }
+        
+        .bar:nth-child(1) { height: 30px; animation-delay: 0s; }
+        .bar:nth-child(2) { height: 70px; animation-delay: 0.1s; }
+        .bar:nth-child(3) { height: 90px; animation-delay: 0.2s; }
+        .bar:nth-child(4) { height: 60px; animation-delay: 0.3s; }
+        .bar:nth-child(5) { height: 40px; animation-delay: 0.4s; }
+        .bar:nth-child(6) { height: 80px; animation-delay: 0.5s; }
+        .bar:nth-child(7) { height: 50px; animation-delay: 0.6s; }
+        
+        @keyframes bar-anim {
+            0%, 100% { height: 30px; }
+            50% { height: 90px; }
+        }
+        
+        .assistant-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 20, 10, 0.5);
+            border-radius: 8px;
+            border: 1px solid #003b15;
+        }
+        
+        .info-card {
+            text-align: center;
+            padding: 10px;
+            flex: 1;
+        }
+        
+        .info-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #00cc55;
+        }
+        
+        .info-card p {
+            font-size: 18px;
+            color: #00ff41;
+        }
+        
+        .matrix-code {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .matrix-char {
+            position: absolute;
+            font-size: 18px;
+            color: #00ff41;
+            animation: fall linear infinite;
+        }
+        
+        @keyframes fall {
+            to { transform: translateY(100vh); }
+        }
+    </style>
+</head>
+<body>
+    <div class="scanlines"></div>
+    
+    <div class="matrix-code" id="matrixCode"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="ai-icon">
+                    <i class="fas fa-robot" style="color: #000;"></i>
+                </div>
+                <h1>TONY AI ASSISTANT</h1>
+            </div>
+            <div class="status">
+                <div class="status-indicator"></div>
+                <span>SYSTEM: ACTIVE</span>
+            </div>
+        </header>
+        
+        <div class="terminal">
+            <div class="terminal-header">
+                <div class="terminal-title">ASSISTANT CONSOLE</div>
+                <div class="terminal-controls">
+                    <div class="control-btn close"></div>
+                    <div class="control-btn minimize"></div>
+                    <div class="control-btn maximize"></div>
+                </div>
+            </div>
+            
+            <div class="output" id="output">
+                <div class="output-line">> SYSTEM INITIALIZATION COMPLETE</div>
+                <div class="output-line">> AI CORE: ONLINE</div>
+                <div class="output-line">> VOICE MODULE: ACTIVE</div>
+                <div class="output-line">> SECURITY PROTOCOLS: ENABLED</div>
+                <div class="output-line">> USER: HIMANSHU VERIFIED</div>
+                <div class="output-line">> ENTER COMMAND OR SAY "TONY" TO ACTIVATE</div>
+            </div>
+            
+            <div class="input-area">
+                <div class="prompt">TONY></div>
+                <input type="text" class="command-input" id="commandInput" placeholder="Type command or speak...">
+            </div>
+        </div>
+        
+        <div class="visualizer">
+            <div class="visualizer-bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+        </div>
+        
+        <div class="assistant-info">
+            <div class="info-card">
+                <h3>SYSTEM STATUS</h3>
+                <p>OPERATIONAL</p>
+            </div>
+            <div class="info-card">
+                <h3>ACTIVE MODULE</h3>
+                <p>VOICE AI</p>
+            </div>
+            <div class="info-card">
+                <h3>RESPONSE TIME</h3>
+                <p>0.42s</p>
+            </div>
+            <div class="info-card">
+                <h3>CONNECTION</h3>
+                <p>SECURE</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Create matrix code rain effect
+        function createMatrix() {
+            const container = document.getElementById('matrixCode');
+            const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$#@%&!";
+            const fontSize = 18;
+            const columns = Math.floor(window.innerWidth / fontSize);
+            
+            for (let i = 0; i < columns; i++) {
+                const char = document.createElement('div');
+                char.classList.add('matrix-char');
+                char.style.left = `${i * fontSize}px`;
+                char.style.animationDuration = `${Math.random() * 5 + 5}s`;
+                char.style.animationDelay = `${Math.random() * 5}s`;
+                char.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
+                container.appendChild(char);
+                
+                // Change characters periodically
+                setInterval(() => {
+                    char.textContent = chars.charAt(Math.floor(Math.random() * chars.length));
+                }, Math.random() * 1000 + 500);
+            }
+        }
+        
+        // Terminal functionality
+        const output = document.getElementById('output');
+        const commandInput = document.getElementById('commandInput');
+        
+        // Add a line to terminal output
+        function addOutputLine(text) {
+            const line = document.createElement('div');
+            line.classList.add('output-line');
+            line.textContent = `> ${text}`;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
+        }
+        
+        // Process commands
+        function processCommand(command) {
+            if (!command) return;
+            
+            addOutputLine(`COMMAND RECEIVED: ${command}`);
+            
+            // Simulate processing
+            setTimeout(() => {
+                const responses = [
+                    "EXECUTING COMMAND...",
+                    "ACCESSING DEVICE SYSTEMS...",
+                    "PROCESSING NATURAL LANGUAGE...",
+                    "CONTACTING AI SERVERS...",
+                    "ANALYZING REQUEST..."
+                ];
+                
+                addOutputLine(responses[Math.floor(Math.random() * responses.length)]);
+                
+                // Show result after delay
+                setTimeout(() => {
+                    const actions = {
+                        "hello": "GREETINGS, HIMANSHU. HOW CAN I ASSIST YOU TODAY?",
+                        "open youtube": "LAUNCHING YOUTUBE APPLICATION...",
+                        "call mom": "INITIATING VOICE CALL TO CONTACT: MOM...",
+                        "flashlight on": "ACTIVATING DEVICE FLASHLIGHT...",
+                        "weather": "ACCESSING WEATHER DATA... CURRENT TEMPERATURE: 27°C, SUNNY",
+                        "play music": "ACCESSING MEDIA LIBRARY... PLAYING RECENT TRACKS",
+                        "system status": "ALL SYSTEMS OPERATIONAL. BATTERY: 78%. MEMORY USAGE: 42%",
+                        "who are you": "I AM TONY - YOUR PERSONAL AI ASSISTANT. VERSION 2.3.5",
+                        "thank you": "YOU'RE WELCOME, HIMANSHU. ALWAYS AT YOUR SERVICE",
+                        "goodbye": "DEACTIVATING USER INTERFACE. SAY 'TONY' TO REACTIVATE"
+                    };
+                    
+                    const response = actions[command.toLowerCase()] || 
+                                    `COMMAND PROCESSED: "${command}". AWAITING FURTHER INSTRUCTIONS.`;
+                    
+                    addOutputLine(response);
+                }, 1000);
+            }, 600);
+        }
+        
+        // Set up command input
+        commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                processCommand(commandInput.value);
+                commandInput.value = '';
+            }
+        });
+        
+        // Simulate AI activity
+        setInterval(() => {
+            const statuses = [
+                "MONITORING DEVICE SENSORS...",
+                "BACKGROUND PROCESSES RUNNING...",
+                "NETWORK SECURITY: ACTIVE",
+                "VOICE RECOGNITION: STANDBY",
+                "MEMORY USAGE: 42%"
+            ];
+            
+            if (Math.random() > 0.7) {
+                addOutputLine(statuses[Math.floor(Math.random() * statuses.length)]);
+            }
+        }, 5000);
+        
+        // Initialize
+        createMatrix();
+        addOutputLine("TONY AI ASSISTANT READY. AWAITING USER COMMANDS...");
+        
+        // Simulate voice command
+        setTimeout(() => {
+            addOutputLine("VOICE COMMAND DETECTED: 'TONY, HELLO'");
+            setTimeout(() => {
+                addOutputLine("RESPONSE: GREETINGS, HIMANSHU. HOW CAN I ASSIST YOU TODAY?");
+            }, 800);
+        }, 3000);
+    </script>
+</body>
+</html>
