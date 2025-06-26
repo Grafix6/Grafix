@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tony AI Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --jarvis-blue: #00f0ff;
+            --jarvis-dark: #0a0a1a;
+            --jarvis-panel: rgba(10, 20, 40, 0.8);
+            --jarvis-glow: 0 0 10px var(--jarvis-blue), 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+        
+        body {
+            background: var(--jarvis-dark);
+            color: var(--jarvis-blue);
+            height: 100vh;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 80, 120, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(0, 150, 200, 0.1) 0%, transparent 20%);
+        }
+        
+        .hud-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 240, 255, 0.05),
+                rgba(0, 240, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            z-index: 100;
+        }
+        
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                to bottom,
+                transparent 0%,
+                transparent 99%,
+                rgba(0, 240, 255, 0.1) 100%
+            );
+            background-size: 100% 4px;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 101;
+        }
+        
+        @keyframes scanline {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+        
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto 1fr auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--jarvis-panel);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: var(--jarvis-glow);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #0066cc, #00ccff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--jarvis-glow);
+            animation: pulse 3s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .logo h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            text-shadow: var(--jarvis-glow);
+            letter-spacing: 1px;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 15px;
+            height: 15px;
+            background: #0f0;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #0f0;
+            animation: blink 1.5s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .status-text {
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            height: 100%;
+        }
+        
+        .panel {
+            background: var(--jarvis-panel);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: var(--jarvis-glow);
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .visualization {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .face {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+        
+        .helmet {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, #1a2a4a, #0a1428);
+            border-radius: 50%;
+            border: 2px solid var(--jarvis-blue);
+            box-shadow: inset 0 0 20px rgba(0, 240, 255, 0.5), 0 0 20px rgba(0, 240, 255, 0.5);
+            overflow: hidden;
+        }
+        
+        .eye {
+            position: absolute;
+            top: 40%;
+            width: 60px;
+            height: 30px;
+            background: #111;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 10px #000;
+        }
+        
+        .eye-left {
+            left: 25%;
+            transform: translateX(-50%);
+        }
+        
+        .eye-right {
+            right: 25%;
+            transform: translateX(50%);
+        }
+        
+        .eye-light {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: var(--jarvis-blue);
+            border-radius: 50%;
+            filter: blur(5px);
+            animation: eye-glow 2s infinite alternate;
+        }
+        
+        @keyframes eye-glow {
+            0% { opacity: 0.7; box-shadow: 0 0 10px var(--jarvis-blue); }
+            100% { opacity: 1; box-shadow: 0 0 30px var(--jarvis-blue), 0 0 50px rgba(0, 240, 255, 0.5); }
+        }
+        
+        .console {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .console-header {
+            display: flex;
+            justify-content: space-between;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+            margin-bottom: 15px;
+        }
+        
+        .console-title {
+            font-size: 1.3rem;
+            font-weight: 500;
+        }
+        
+        .console-content {
+            flex: 1;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        
+        .console-line {
+            margin-bottom: 8px;
+            animation: appear 0.3s ease-out;
+        }
+        
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-area {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            border-top: 1px solid rgba(0, 240, 255, 0.3);
+            padding-top: 15px;
+        }
+        
+        .prompt {
+            margin-right: 10px;
+            font-weight: bold;
+            color: #0f0;
+            text-shadow: 0 0 5px #0f0;
+        }
+        
+        .command-input {
+            background: transparent;
+            border: none;
+            color: var(--jarvis-blue);
+            font-size: 1.1rem;
+            flex: 1;
+            outline: none;
+            font-family: 'Courier New', monospace;
+            padding: 5px 10px;
+            border-bottom: 1px solid rgba(0, 240, 255, 0.3);
+        }
+        
+        .command-input:focus {
+            border-bottom: 1px solid var(--jarvis-blue);
+            box-shadow: 0 1px 0 0 rgba(0, 240, 255, 0.5);
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            padding: 20px;
+            background: var(--jarvis-panel);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 240, 255, 0.3);
+            box-shadow: var(--jarvis-glow);
+            backdrop-filter: blur(10px);
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: rgba(0, 30, 60, 0.5);
+            border-radius: 10px;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+        }
+        
+        .stat-title {
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-shadow: var(--jarvis-glow);
+        }
+        
+        .audio-wave {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            height: 80px;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        
+        .wave-bar {
+            width: 8px;
+            background: var(--jarvis-blue);
+            border-radius: 4px;
+            animation: wave 1.2s infinite ease-in-out;
+            box-shadow: 0 0 5px var(--jarvis-blue);
+        }
+        
+        .wave-bar:nth-child(1) { height: 20px; animation-delay: 0s; }
+        .wave-bar:nth-child(2) { height: 40px; animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { height: 60px; animation-delay: 0.2s; }
+        .wave-bar:nth-child(4) { height: 80px; animation-delay: 0.3s; }
+        .wave-bar:nth-child(5) { height: 60px; animation-delay: 0.4s; }
+        .wave-bar:nth-child(6) { height: 40px; animation-delay: 0.5s; }
+        .wave-bar:nth-child(7) { height: 20px; animation-delay: 0.6s; }
+        
+        @keyframes wave {
+            0%, 100% { height: 20px; }
+            50% { height: 80px; }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hud-overlay"></div>
+    <div class="scanlines"></div>
+    
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">T</div>
+                <h1>TONY AI ASSISTANT</h1>
+            </div>
+            <div class="status">
+                <div class="status-indicator"></div>
+                <div class="status-text">ACTIVE & SECURE</div>
+            </div>
+        </header>
+        
+        <div class="main-content">
+            <div class="panel visualization">
+                <div class="face">
+                    <div class="helmet">
+                        <div class="eye eye-left">
+                            <div class="eye-light"></div>
+                        </div>
+                        <div class="eye eye-right">
+                            <div class="eye-light"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="audio-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+            </div>
+            
+            <div class="panel console">
+                <div class="console-header">
+                    <div class="console-title">ASSISTANT CONSOLE</div>
+                    <div class="console-time" id="currentTime">--:--:--</div>
+                </div>
+                
+                <div class="console-content" id="consoleOutput">
+                    <div class="console-line">> SYSTEM INITIALIZATION COMPLETE</div>
+                    <div class="console-line">> AI CORE: ONLINE</div>
+                    <div class="console-line">> VOICE RECOGNITION: ACTIVE</div>
+                    <div class="console-line">> SECURITY PROTOCOLS: ENABLED</div>
+                    <div class="console-line">> USER: HIMANSHU VERIFIED</div>
+                    <div class="console-line">> SAY "TONY" TO ACTIVATE VOICE COMMANDS</div>
+                </div>
+                
+                <div class="input-area">
+                    <div class="prompt">TONY&gt;</div>
+                    <input type="text" class="command-input" id="commandInput" placeholder="Type command or speak...">
+                </div>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-title">SYSTEM STATUS</div>
+                <div class="stat-value">OPERATIONAL</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">RESPONSE TIME</div>
+                <div class="stat-value">0.24s</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">ACTIVE MODULE</div>
+                <div class="stat-value">VOICE AI</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">CONNECTION</div>
+                <div class="stat-value">SECURE</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Update current time
+        function updateTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            }).toUpperCase();
+            document.getElementById('currentTime').textContent = timeString;
+        }
+        
+        // Initialize
+        setInterval(updateTime, 1000);
+        updateTime();
+        
+        // Console functionality
+        const consoleOutput = document.getElementById('consoleOutput');
+        const commandInput = document.getElementById('commandInput');
+        
+        function addConsoleLine(text) {
+            const line = document.createElement('div');
+            line.classList.add('console-line');
+            line.textContent = `> ${text}`;
+            consoleOutput.appendChild(line);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        // Simulate Tony's responses
+        commandInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const command = commandInput.value;
+                addConsoleLine(`USER COMMAND: ${command}`);
+                commandInput.value = '';
+                
+                // Simulate Tony processing
+                setTimeout(() => {
+                    const responses = [
+                        "Processing command...",
+                        "Accessing systems...",
+                        "Executing request..."
+                    ];
+                    addConsoleLine(responses[Math.floor(Math.random() * responses.length)]);
+                    
+                    setTimeout(() => {
+                        const actions = {
+                            "hello": "Hello Sir, how can I assist you today?",
+                            "open github": "Accessing GitHub repository...",
+                            "open website": "Opening your website...",
+                            "call mom": "Initiating call to contact: Mom...",
+                            "flashlight on": "Activating device flashlight...",
+                            "hindi": "Switching to Hindi: नमस्ते, मैं टोनी हूँ",
+                            "english": "Switching to English: Hello, I'm Tony"
+                        };
+                        
+                        const response = actions[command.toLowerCase()] || 
+                                        `Command executed: ${command}. Awaiting further instructions.`;
+                        addConsoleLine(response);
+                    }, 1000);
+                }, 500);
+            }
+        });
+        
+        // Simulate system activity
+        setInterval(() => {
+            const activities = [
+                "Monitoring device sensors...",
+                "Background processes running optimally...",
+                "Network security: Active",
+                "Voice recognition: Standby",
+                "Memory usage: 42%"
+            ];
+            
+            if (Math.random() > 0.7) {
+                addConsoleLine(activities[Math.floor(Math.random() * activities.length)]);
+            }
+        }, 5000);
+    </script>
+</body>
+</html>
